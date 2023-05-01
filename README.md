@@ -14,108 +14,103 @@ Our implementation is tested on Ubuntu 18.04.5 with Tesla V100-SXM2-32GB. Suppor
 conda env create -f APL.yaml
 conda activate APL
 ```
+
 ## Data Preparation
-1. Download three datasets using scripts
-   - 1
 
+1. Download DomainNet, Sketchy and TU-Berlin using scripts in `./APL/downloads`.
 
-Please download AlexNet pretrianed model from ()()() and place it into `./data/models/`
+   ``` bash
+   cd ./APL/downloads
+   bash download_domainnet.sh
+   bash download_sketchy.sh
+   bash download_tuberlin.sh
+   ```
 
-### Dataset Preparation
+2. The directory is expected to be in the structure below:
 
-CIFAR-10:
-
-- Training set: 5000
-- Query set: 1000
-- Gallery: 54000
-
-You should split CIFAR-10 by yourself. [Download it](https://www.cs.toronto.edu/~kriz/cifar.html) and split it as the paper described.
-
----
-
-NUS-WIDE:
-
-- Training set: 10000
-- Query set: 5000
-- Gallery: 190834
-
-Please [download the dataset](https://github.com/lhmRyan/deep-supervised-hashing-DSH/issues/8#issuecomment-314314765) and put it into a specific directory. Then you should modify the prefixs of all paths in [/data/nus21](./data/nus21)
-
----
-
-Imagenet:
-
-- Training set: 10000
-- Query set: 5000
-- Gallery: 128564
-
-Please download the dataset (ILSVRC >= 2012) and put it into a specific directory. Then you should modify the prefixs of all paths in [/data/imagenet](./data/imagenet)
+   ```python
+   ├── DomainNet
+   │   ├── clipart # images from clipart domain
+   │   ├── clipart_test.txt # class names for testing
+   │   ├── clipart_train.txt # class names for training
+   │   ├── down.sh
+   │   ├── infograph
+   │   ├── infograph_test.txt
+   │   ├── infograph_train.txt
+   │   ├── painting
+   │   ├── painting_test.txt
+   │   ├── painting_train.txt
+   │   ├── quickdraw
+   │   ├── quickdraw_test.txt
+   │   ├── quickdraw_train.txt
+   │   ├── real
+   │   ├── real_test.txt
+   │   ├── real_train.txt
+   │   ├── sketch
+   │   ├── sketch_test.txt
+   │   └── sketch_train.txt
+   ├── Sketchy
+   │   ├── extended_photo
+   │   ├── photo
+   │   ├── sketch
+   │   └── zeroshot1
+   └── TUBerlin
+       ├── images
+       └── sketches
+   ```
 
 ## Run
 
-Firstly, list all the parameter of scripts:
+- To perform a training and evaluation for APL in three different datasets, use the scripts in `./APL/src/alogs/APL/reproduce_runs.sh`:
 
-    python main.py --help
+```bash
+# DomainNet
+python3 main.py -data DomainNet -hd sketch -sd quickdraw -bs 50 -log 15 -lr 0.0001 -use_NTP 0 -tp_N_CTX 16 -GP_CLS_NUM_TOKENS 1 -GP_DOM_NUM_TOKENS 1 -debug_mode 0 
+python3 main.py -data DomainNet -hd quickdraw -sd sketch -bs 50 -log 15 -lr 0.0001 -use_NTP 0 -tp_N_CTX 1 -GP_CLS_NUM_TOKENS 1 -GP_DOM_NUM_TOKENS 1 -debug_mode 0 
+python3 main.py -data DomainNet -hd clipart -sd painting -bs 50 -log 15 -lr 0.0001 -use_NTP 0 -tp_N_CTX 16 -GP_CLS_NUM_TOKENS 1 -GP_DOM_NUM_TOKENS 1 -debug_mode 0 
+python3 main.py -data DomainNet -hd painting -sd infograph -bs 50 -log 15 -lr 0.0001 -use_NTP 0 -tp_N_CTX 16 -GP_CLS_NUM_TOKENS 1 -GP_DOM_NUM_TOKENS 1 -debug_mode 0 
+python3 main.py -data DomainNet -hd infograph -sd painting -bs 50 -log 15 -lr 0.0001 -use_NTP 0 -tp_N_CTX 16 -GP_CLS_NUM_TOKENS 1 -GP_DOM_NUM_TOKENS 1 -debug_mode 0 
 
-    usage: main.py [-h] [--Dataset DATASET] [--Mode MODE] [--BitLength BITLENGTH]
-               [--ClassNum CLASSNUM] [--K K] [--PrintEvery PRINTEVERY]
-               [--LearningRate LEARNINGRATE] [--Epoch EPOCH]
-               [--BatchSize BATCHSIZE] [--Device DEVICE] [--UseGPU [USEGPU]]
-               [--noUseGPU] [--SaveModel [SAVEMODEL]] [--noSaveModel] [--R R]
-               [--Lambda LAMBDA] [--Tau TAU] [--Mu MU] [--Nu NU]
+# Sketchy
+python3 main.py -data Sketchy -bs 50 -log 15 -lr 0.0001 -use_NTP 0 -tp_N_CTX 16 -GP_CLS_NUM_TOKENS 1 -GP_DOM_NUM_TOKENS 1 -debug_mode 0 
 
-    optional arguments:
-    -h, --help            show this help message and exit
-    --Dataset DATASET     The preferred dataset, 'CIFAR', 'NUS' or 'Imagenet'
-    --Mode MODE           'train' or 'eval'
-    --BitLength BITLENGTH
-                            Binary code length
-    --ClassNum CLASSNUM   Label num of dataset
-    --K K                 The centroids number of a codebook
-    --PrintEvery PRINTEVERY
-                            Print every ? iterations
-    --LearningRate LEARNINGRATE
-                            Init learning rate
-    --Epoch EPOCH         Total epoches
-    --BatchSize BATCHSIZE
-                            Batch size
-    --Device DEVICE       GPU device ID
-    --UseGPU [USEGPU]     Use /device:GPU or /cpu
-    --noUseGPU
-    --SaveModel [SAVEMODEL]
-                            Save model at every epoch done
-    --noSaveModel
-    --R R                 mAP@R, -1 for all
-    --Lambda LAMBDA       Lambda, decribed in paper
-    --Tau TAU             Tau, decribed in paper
-    --Mu MU               Mu, decribed in paper
-    --Nu NU               Nu, decribed in paper
+# TUBerlin
+python3 main.py -data TUBerlin -bs 50 -log 15 -lr 0.0001 -use_NTP 0 -tp_N_CTX 16 -GP_CLS_NUM_TOKENS 1 -GP_DOM_NUM_TOKENS 1 -debug_mode 0 
+```
 
-To perform a training:
+- To perform a training and evaluation for CLIP-Prompted in three different datasets, use the scripts in `./APL/src/alogs/CLIP-Prompted/reproduce_runs.sh`:
 
-    python main.py --Dataset='CIFAR' --ClassNum=10 --LearningRate=0.001 --Device=0
+```bash
+# DomainNet
+python3 main.py -data DomainNet -hd sketch -sd quickdraw  -bs 256  -es 2 -lr 0.001  -log 15 -e 100 -ts TP+VP 
+python3 main.py -data DomainNet -hd quickdraw -sd sketch  -bs 256  -es 2 -lr 0.001  -log 15 -e 100 -ts TP+VP 
+python3 main.py -data DomainNet -hd painting -sd infograph  -bs 256  -es 2 -lr 0.001  -log 15 -e 100 -ts TP+VP
+python3 main.py -data DomainNet -hd infograph -sd painting  -bs 256  -es 2 -lr 0.001  -log 15 -e 100 -ts TP+VP
+python3 main.py -data DomainNet -hd clipart -sd painting  -bs 256  -es 2 -lr 0.001  -log 15 -e 100 -ts TP+VP
 
-To perform an evaluation:
+# Sketchy
+python3 main.py -data Sketchy -bs 256  -es 2 -lr 0.001  -log 15 -e 100 -ts TP+VP -debug_mode 0
 
-    python Eval.py --Dataset='CIFAR' --ClassNum=10 --Device=0 --R=-1
-
-## Citations
-
-Please use the following bibtex to cite our papers:
+# TU-Berlin
+python3 main.py -data TUBerlin -bs 256  -es 2 -lr 0.001  -log 15 -e 100 -ts TP+VP -debug_mode 0
 
 ```
-@inproceedings{DPQ,
-  title={Beyond Product Quantization: Deep Progressive Quantization for Image Retrieval},
-  author={Gao, Lianli and Zhu, Xiaosu and Song, Jingkuan and Zhao, Zhou and Shen, Heng Tao},
-  booktitle={Proceedings of the 2019 International Joint Conferences on Artifical Intelligence (IJCAI)},
-  year={2019}
-}
+
+- To perform a training and evaluation for CLIP-Baseline in three different datasets, use the scripts in `./APL/src/alogs/CLIP-Baseline/reproduce_runs.sh`:
+
+``` python
+# DomainNet
+
+python3 main.py -hd sketch -sd quickdraw -bs 512 -es 5 -lr 0.001 -clip_bb ViT-B/32 -log 15 -e 100 -ts LP -debug_mode 0
+python3 main.py -hd quickdraw -sd sketch -bs 512 -es 5 -lr 0.001 -clip_bb ViT-B/32 -log 15 -e 100 -ts LP -debug_mode 0
+python3 main.py -hd clipart -sd painting -bs 512 -es 5 -lr 0.001 -clip_bb ViT-B/32 -log 15 -e 100 -ts LP -debug_mode 0
+python3 main.py -hd painting -sd infograph -bs 512 -es 5 -lr 0.001 -clip_bb ViT-B/32 -log 15 -e 100 -ts LP -debug_mode 0
+python3 main.py -hd infograph -sd painting -bs 512 -es 10 -lr 0.001 -clip_bb ViT-B/32 -log 15 -e 100 -ts LP -debug_mode 0
+
+# Sketchy
+python3 main.py -data Sketchy -bs 480 -es 3 -lr 0.001 -clip_bb ViT-B/32 -log 15 -e 100 -ts LP -debug_mode 0
+
+# TUBerlin
+python3 main.py -data TUBerlin -bs 480 -es 3 -lr 0.001 -clip_bb ViT-B/32 -log 15 -e 100 -ts LP -debug_mode 0
 ```
-```
-@inproceedings{DRQ,
-  title={Deep Recurrent Quantization for Generating Sequential Binary Codes},
-  author={Song, Jingkuan and Zhu, Xiaosu and Gao, Lianli and Xu, Xin-Shun and Liu, Wu and Shen, Heng Tao},
-  booktitle={Proceedings of the 2019 International Joint Conferences on Artifical Intelligence (IJCAI)},
-  year={2019}
-}
-```
+
