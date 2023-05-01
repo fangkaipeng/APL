@@ -12,7 +12,6 @@ src/algos/APL/logs/
 *.pdf
 text.json
 *.log
-*.sh
 *.out
 src/algos/CLIP-Baseline/logs/
 src/algos/CLIP-Prompted/logs/
