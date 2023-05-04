@@ -1,9 +1,6 @@
 import sys
 import os
 from tqdm import tqdm
-sys.path.append('/ai/vlp/fkp/APL')
-sys.path.append('/ai/vlp/fkp/APL/src')
-sys.path.append('/ai/vlp/fkp/APL/clip')
 from models.APL import APL
 import torch
 import math

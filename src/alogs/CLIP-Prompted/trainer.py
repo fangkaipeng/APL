@@ -1,7 +1,6 @@
 import sys
 import os
-sys.path.append('/ai/vlp/fkp/APL')
-sys.path.append('/ai/vlp/fkp/APL/src')
+
 from models.PromptedCLIP import CustomCLIP
 import torch
 from torch.nn import functional as F

@@ -1,8 +1,6 @@
 import math
 import sys
 import os
-sys.path.append('/ai/vlp/fkp/APL')
-sys.path.append('/ai/vlp/fkp/APL/src')
 import time
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
